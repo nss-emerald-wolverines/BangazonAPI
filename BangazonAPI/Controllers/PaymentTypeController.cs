@@ -36,7 +36,7 @@ namespace BangazonAPI.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"SELECT p.Id, p.AcctNumber, p.Name, p.CustomerId
-                                          FROM PaymentType p;";
+                                          FROM PaymentType p";
                     
                     SqlDataReader reader = cmd.ExecuteReader();
 
@@ -57,23 +57,52 @@ namespace BangazonAPI.Controllers
                     return paymentTypes;
                 }
             }
-        } 
-
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
-        {
-            return "value";
         }
-
-        // POST api/values
-        [HttpPost]
-        public void Post([FromBody] string value)
+        /***********************
+         GET api/PaymentType/{id}
+        ***********************/
+        [HttpGet("{id}", Name = "GetPaymentType")]
+        public PaymentType Get(int id)
         {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT p.Id, p.AcctNumber, p.Name, p.CustomerId
+                                          FROM PaymentType p
+                                         WHERE p.id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    PaymentType paymentType = null;
+
+                    if (reader.Read())
+                    {
+                        paymentType = new PaymentType
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            AcctNumber = reader.GetInt32(reader.GetOrdinal("AcctNumber")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId"))
+                        };
+                    }
+                    reader.Close();
+                    return paymentType;
+                }
+            }
+        }
+        /***********************
+         POST api/PaymentType/{id}
+        ***********************/
+        [HttpPost]
+        public ActionResult Post([FromBody] PaymentType newPaymentType)
+        {
+
         }
 
         // PUT api/values/5
-        [HttpPut("{id}")]
+        [HttpPut("{ id}")]
         public void Put(int id, [FromBody] string value)
         {
         }
