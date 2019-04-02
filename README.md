@@ -11,4 +11,5 @@ Software Requirements
 Sql Server Manangment Studio Visual Studio Community 2017 Google Chrome
 
 Entity Relationship Diagram
-![Bangazon ERD](/bangazon_official_erd.png ?raw=true)
+
+![Bangazon ERD](/bangazon_official_erd.png?raw=true)
