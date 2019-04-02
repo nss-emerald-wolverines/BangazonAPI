@@ -98,7 +98,16 @@ namespace BangazonAPI.Controllers
         [HttpPost]
         public ActionResult Post([FromBody] PaymentType newPaymentType)
         {
-
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"INSERT INTO PaymentType (acctNumber, name, customerId)
+                                        OUTPUT INSERTED.Id
+                                        VALUES (@Id, @AcctNumber, @Name, @customerId)";
+                }
+            }
         }
 
         // PUT api/values/5
