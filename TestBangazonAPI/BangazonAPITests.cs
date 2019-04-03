@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 using Xunit;
 using BangazonAPI;
 using BangazonAPI.Models;
-namespace BangazonAPItTests
+namespace BangazonAPITests
 {
     public class CustomerTests
     {
         [Fact]
-        public async Task GetCustomer_Succes()
+        public async Task GetCustomer_Success()
         {
 
             using (var client = new APIClientProvider().Client)
@@ -23,7 +23,7 @@ namespace BangazonAPItTests
             }
         }
         [Fact]
-        public async Task GetCustomers_Succes()
+        public async Task GetCustomers_Success()
         {
 
             using (var client = new APIClientProvider().Client)
@@ -35,7 +35,7 @@ namespace BangazonAPItTests
         }
 
         [Fact]
-        public async Task GetCustomersq_Succes()
+        public async Task GetCustomersq_Success()
         {
 
             using (var client = new APIClientProvider().Client)
@@ -47,7 +47,7 @@ namespace BangazonAPItTests
         }
 
         [Fact]
-        public async Task PostCustomer_Succes()
+        public async Task PostCustomer_Success()
         {
 
             using (var client = new APIClientProvider().Client)
@@ -88,8 +88,8 @@ namespace BangazonAPItTests
         {
             var customer = new Customer
             {
-                FirstName = "Marshal",
-                LastName = "Lee"
+                FirstName = "gabryella",
+                LastName = "crawford"
             };
             return JsonConvert.SerializeObject(customer);
         }
