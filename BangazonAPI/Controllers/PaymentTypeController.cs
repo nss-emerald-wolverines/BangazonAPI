@@ -118,12 +118,31 @@ namespace BangazonAPI.Controllers
         }
 
         // PUT api/values/5
-        [HttpPut("{ id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPut("{id}")]
+        public IActionResult Put(int id, [FromBody] PaymentType editPaymentType)
         {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"UPDATE PaymentType
+                                           SET AcctNumber = @acctNumber,
+                                               Name = @name,
+                                               CustomerId = @customerId
+                                         WHERE Id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@acctNumber", editPaymentType.AcctNumber));
+                    cmd.Parameters.Add(new SqlParameter("@name", editPaymentType.Name));
+                    cmd.Parameters.Add(new SqlParameter("@customerId", editPaymentType.CustomerId));
+                    cmd.Parameters.Add(new SqlParameter("@id", editPaymentType.Id));
+
+                    cmd.ExecuteNonQuery();
+                    return NoContent();
+                }
+            }
         }
 
-        // DELETE api/values/5
+        // DELETE api/values/5              
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
