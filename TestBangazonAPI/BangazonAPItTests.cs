@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 using BangazonAPI;
-
+using BangazonAPI.Models;
 namespace BangazonAPItTests
 {
     public class CustomerTests
