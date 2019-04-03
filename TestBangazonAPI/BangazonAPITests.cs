@@ -54,8 +54,6 @@ namespace BangazonAPITests
             {
                 var customer = GenerateCustomer();
                 var response = await client.PostAsync("api/Customer", new StringContent(customer, Encoding.UTF8, "application/json"));
-                response.EnsureSuccessStatusCode();
-
             }
         }
 
@@ -66,8 +64,12 @@ namespace BangazonAPITests
                 FirstName = "Marshal",
                 LastName = "Lee"
             };
+            Assert.Equal("Marshal", customer.FirstName);
+            Assert.Equal("Lee", customer.LastName);
             return JsonConvert.SerializeObject(customer);
+
         }
+
 
 
         [Fact]
@@ -91,6 +93,8 @@ namespace BangazonAPITests
                 FirstName = "gabryella",
                 LastName = "crawford"
             };
+            Assert.Equal("gabryella", customer.FirstName);
+            Assert.Equal("crawford", customer.LastName);
             return JsonConvert.SerializeObject(customer);
         }
     }
