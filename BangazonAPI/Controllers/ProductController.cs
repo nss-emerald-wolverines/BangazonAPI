@@ -23,13 +23,13 @@ namespace BangazonAPI.Controllers
 
         public SqlConnection Connection
         {
-            get          
+            get
             {
                 return new SqlConnection(_config.GetConnectionString("DefaultConnection"));
             }
         }
 
-        // CODE FOR GETTING A LIST OF ProductsS
+        // CODE FOR GETTING A LIST OF Products
 
         [HttpGet]
         public async Task<IActionResult> Get()
@@ -39,7 +39,7 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = "SELECT Id, Price, Title, Description, Quantity FROM Product";
+                    cmd.CommandText = "SELECT Id, ProductTypeId, CustomerId, Price, Title, Description, Quantity FROM Product";
                     SqlDataReader reader = cmd.ExecuteReader();
                     List<Product> products = new List<Product>();
 
@@ -48,6 +48,8 @@ namespace BangazonAPI.Controllers
                         Product product = new Product
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            ProductTypeId = reader.GetInt32(reader.GetOrdinal("ProductTypeId")),
+                            CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
                             Price = reader.GetInt32(reader.GetOrdinal("Price")),
                             Title = reader.GetString(reader.GetOrdinal("Title")),
                             Description = reader.GetString(reader.GetOrdinal("Description")),
@@ -74,7 +76,7 @@ namespace BangazonAPI.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"SELECT
-                            Id, Price, Title, Description, Quantity
+                            Id, ProductTypeId, CustomerId, Price, Title, Description, Quantity
                             FROM Product
                             WHERE Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
@@ -87,6 +89,8 @@ namespace BangazonAPI.Controllers
                         product = new Product
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            ProductTypeId = reader.GetInt32(reader.GetOrdinal("ProductTypeId")),
+                            CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
                             Price = reader.GetInt32(reader.GetOrdinal("Price")),
                             Title = reader.GetString(reader.GetOrdinal("Title")),
                             Description = reader.GetString(reader.GetOrdinal("Description")),
@@ -96,6 +100,126 @@ namespace BangazonAPI.Controllers
                     reader.Close();
 
                     return Ok(product);
+                }
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] Product product)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"INSERT INTO Product (Price, Title, Description, Quantity)
+                                        OUTPUT INSERTED.Id
+                                        VALUES (@price, @title, @description, @quantity)";
+                    cmd.Parameters.Add(new SqlParameter("@price", product.Price));
+                    cmd.Parameters.Add(new SqlParameter("@title", product.Title));
+                    cmd.Parameters.Add(new SqlParameter("@description", product.Description));
+                    cmd.Parameters.Add(new SqlParameter("@quantity", product.Quantity));
+
+                    int newId = (int)cmd.ExecuteScalar();
+                    product.Id = newId;
+                    return CreatedAtRoute("GetProduct", new { id = newId }, product);
+                }
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put([FromRoute] int id, [FromBody] Product product)
+        {
+            try
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"UPDATE Product
+                                            SET Price = @price,
+                                                Title = @title,
+                                                Description = @description,
+                                                Quantity = @quantity
+                                            WHERE Id = @id";
+                        cmd.Parameters.Add(new SqlParameter("@price", product.Price));
+                        cmd.Parameters.Add(new SqlParameter("@title", product.Title));
+                        cmd.Parameters.Add(new SqlParameter("@description", product.Description));
+                        cmd.Parameters.Add(new SqlParameter("@quantity", product.Quantity));
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                        int rowsAffected = cmd.ExecuteNonQuery();
+                        if (rowsAffected > 0)
+                        {
+                            return new StatusCodeResult(StatusCodes.Status204NoContent);
+                        }
+                        throw new Exception("No rows affected");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                if (!ProductExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete([FromRoute] int id)
+        {
+            try
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"DELETE FROM Product WHERE Id = @id";
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                        int rowsAffected = cmd.ExecuteNonQuery();
+                        if (rowsAffected > 0)
+                        {
+                            return new StatusCodeResult(StatusCodes.Status204NoContent);
+                        }
+                        throw new Exception("No rows affected");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                if (!ProductExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+
+        private bool ProductExists(int id)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                        SELECT Id, Price, Title, Description, Quantity
+                        FROM Product
+                        WHERE Id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    return reader.Read();
                 }
             }
         }
