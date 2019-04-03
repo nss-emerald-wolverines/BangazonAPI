@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 // Making the basic class with no constructor at the moment.
 namespace BangazonAPI.Models
