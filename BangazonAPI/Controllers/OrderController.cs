@@ -46,8 +46,8 @@ namespace BangazonAPI.Controllers
                                         pt.AcctNumber,
                                         pt.[Name] AS PaymentTypeName
                                     FROM [Order] o
-                                    LEFT JOIN Customer c on o.CustomerId = c.id
-                                    LEFT JOIN PaymentType pt on o.PaymentTypeId = pt.id";
+                                    LEFT JOIN Customer c on o.CustomerId = c.Id
+                                    LEFT JOIN PaymentType pt on o.PaymentTypeId = pt.Id";
 
                     SqlDataReader reader = cmd.ExecuteReader();
 
@@ -57,7 +57,7 @@ namespace BangazonAPI.Controllers
                     {
                         Order order = new Order
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Id = reader.GetInt32(reader.GetOrdinal("OrderId")),
                             CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
                             PaymentTypeId = reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
                             Customer = new Customer
@@ -65,14 +65,17 @@ namespace BangazonAPI.Controllers
                                 Id = reader.GetInt32(reader.GetOrdinal("CustomerId")),
                                 FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                                 LastName = reader.GetString(reader.GetOrdinal("LastName"))
-                            },
-                            PaymentType = new PaymentType
+                            }
+
+                            /* It's possible the Payment type could be null - What would that mean???
+                               However, not asking for PaymentTpe link in issue ticket
+                               PaymentType = new PaymentType
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
                                 AcctNumber = reader.GetInt32(reader.GetOrdinal("AcctNumber")),
                                 Name = reader.GetString(reader.GetOrdinal("PaymentTypeName")),
                                 CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
-                            },
+                            } */
                         };
 
                         orders.Add(order);
