@@ -31,8 +31,11 @@ namespace BangazonAPI.Controllers
         // CODE FOR GETTING A LIST - GET: api/Order
 
         [HttpGet]
-        public IEnumerable<Order> Get(string include, string q)
+        // GET: api/Orders?q=joe&include=customer
+
         // public async Task<IActionResult> Get()
+        public IEnumerable<Order> Get(string include, string q)
+        
         {
             using (SqlConnection conn = Connection)
             {
@@ -71,34 +74,40 @@ namespace BangazonAPI.Controllers
 
                     while (reader.Read())
                     {
-                        Order order = new Order
+                        if (include == "customer")
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("OrderId")),
-                            CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
-                            PaymentTypeId = reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
-                            Customer = new Customer
+                            Order newOrder = new Order
                             {
-                                Id = reader.GetInt32(reader.GetOrdinal("CustomerId")),
-                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                                LastName = reader.GetString(reader.GetOrdinal("LastName"))
-                            }
-
-                            /* It's possible the Payment type could be null - What would that mean???
-                               However, not asking for PaymentTpe link in issue ticket
-                               PaymentType = new PaymentType
-                            {
-                                Id = reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
-                                AcctNumber = reader.GetInt32(reader.GetOrdinal("AcctNumber")),
-                                Name = reader.GetString(reader.GetOrdinal("PaymentTypeName")),
+                                Id = reader.GetInt32(reader.GetOrdinal("OrderId")),
                                 CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
-                            } */
-                        };
+                                PaymentTypeId = reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
+                                Customer = new Customer
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("CustomerId")),
+                                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                    LastName = reader.GetString(reader.GetOrdinal("LastName"))
+                                }
+                            };
+                            orders.Add(newOrder);
 
-                        orders.Add(order);
+                        }
+                        else
+                        {
+                            Order newOrder = new Order
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("OrderId")),
+                                CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
+                                PaymentTypeId = reader.GetInt32(reader.GetOrdinal("PaymentTypeId"))
+                            };
+
+                            orders.Add(newOrder);
+                        };                       
                     }
+
                     reader.Close();
 
-                    return Ok(orders);
+                   // return orders.Values.ToList();
+                    return (orders);
                 }
             }
         }
