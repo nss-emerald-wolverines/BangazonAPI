@@ -2,7 +2,7 @@
 
 public class Customer
 {
-    public string firstName { get; set; }
-    public string lastName { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
     public int Id { get; internal set; }
 }
