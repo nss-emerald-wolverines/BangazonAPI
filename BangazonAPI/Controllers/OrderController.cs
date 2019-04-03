@@ -31,23 +31,39 @@ namespace BangazonAPI.Controllers
         // CODE FOR GETTING A LIST - GET: api/Order
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public IEnumerable<Order> Get(string include, string q)
+        // public async Task<IActionResult> Get()
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT o.Id AS OrderId,
+                    if (include == "customer")
+                    {
+                        cmd.CommandText = @"SELECT o.Id AS OrderId,
                                         o.CustomerId,
                                         o.PaymentTypeId,
                                         c.FirstName,
-                                        c.LastName,
-                                        pt.AcctNumber,
-                                        pt.[Name] AS PaymentTypeName
+                                        c.LastName                                        
                                     FROM [Order] o
                                     LEFT JOIN Customer c on o.CustomerId = c.Id
-                                    LEFT JOIN PaymentType pt on o.PaymentTypeId = pt.Id";
+                                    WHERE 1 = 1";
+                        // LEFT JOIN PaymentType pt on o.PaymentTypeId = pt.Id";
+                    }
+                    else
+                    {
+                        cmd.CommandText = @"SELECT o.Id AS OrderId, o.CustomerId, o.PaymentTYpeId FROM [Order] o";
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(q))
+                    {
+                        cmd.CommandText += @" AND 
+                                             ( LIKE @q OR
+                                              s.LastName LIKE @q OR
+                                              s.SlackHandle LIKE @q)";
+                        cmd.Parameters.Add(new SqlParameter("@q", $"%{q}%"));
+                    }
 
                     SqlDataReader reader = cmd.ExecuteReader();
 
@@ -91,6 +107,7 @@ namespace BangazonAPI.Controllers
          // CODE FOR GETTING A SINGLE ORDER
         // GET: api/Order/5
         [HttpGet("{id}", Name = "GetOne")]
+        
         public async Task<IActionResult> Get([FromRoute] int id)
         {
             using (SqlConnection conn = Connection)
@@ -98,7 +115,14 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT Id, CustomerId, PaymentTypeId FROM [Order]
+                    // cmd.CommandText = @"SELECT Id, CustomerId, PaymentTypeId FROM [Order]
+                    cmd.CommandText = @"SELECT o.Id AS OrderId,
+                                        o.CustomerId,
+                                        o.PaymentTypeId,
+                                        c.FirstName,
+                                        c.LastName                                        
+                                    FROM [Order] o
+                                    LEFT JOIN Customer c on o.CustomerId = c.Id
                                         WHERE Id = @id";
 
                     cmd.Parameters.Add(new SqlParameter("@id", id));
@@ -112,8 +136,15 @@ namespace BangazonAPI.Controllers
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
-                            PaymentTypeId = reader.GetInt32(reader.GetOrdinal("PaymentTypeId"))
+                            PaymentTypeId = reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
+                            Customer = new Customer
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("CustomerId")),
+                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                LastName = reader.GetString(reader.GetOrdinal("LastName"))
+                            }
                         };
+
                     
                     }
                     reader.Close();
