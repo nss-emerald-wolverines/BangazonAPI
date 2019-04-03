@@ -103,6 +103,9 @@ namespace BangazonAPI.Controllers
                 }
             }
         }
+
+        /* Code for Posting Product */
+
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] Product product)
         {
@@ -111,9 +114,11 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"INSERT INTO Product (Price, Title, Description, Quantity)
+                    cmd.CommandText = @"INSERT INTO Product (ProductTypeId, CustomerId, Price, Title, Description, Quantity)
                                         OUTPUT INSERTED.Id
-                                        VALUES (@price, @title, @description, @quantity)";
+                                        VALUES (@producttypeid, @customerId, @price, @title, @description, @quantity)";
+                    cmd.Parameters.Add(new SqlParameter("@producttypeId", product.ProductTypeId));
+                    cmd.Parameters.Add(new SqlParameter("@customerId", product.CustomerId));
                     cmd.Parameters.Add(new SqlParameter("@price", product.Price));
                     cmd.Parameters.Add(new SqlParameter("@title", product.Title));
                     cmd.Parameters.Add(new SqlParameter("@description", product.Description));
@@ -126,6 +131,8 @@ namespace BangazonAPI.Controllers
             }
         }
 
+        /* Code for Editing Product */
+
         [HttpPut("{id}")]
         public async Task<IActionResult> Put([FromRoute] int id, [FromBody] Product product)
         {
@@ -137,11 +144,15 @@ namespace BangazonAPI.Controllers
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
                         cmd.CommandText = @"UPDATE Product
-                                            SET Price = @price,
+                                            SET ProductTypeId = @producttypeid,
+                                                CustomerId = @customerid,
+                                                Price = @price,
                                                 Title = @title,
                                                 Description = @description,
                                                 Quantity = @quantity
                                             WHERE Id = @id";
+                        cmd.Parameters.Add(new SqlParameter("@producttypeid", product.ProductTypeId));
+                        cmd.Parameters.Add(new SqlParameter("@customerid", product.CustomerId));
                         cmd.Parameters.Add(new SqlParameter("@price", product.Price));
                         cmd.Parameters.Add(new SqlParameter("@title", product.Title));
                         cmd.Parameters.Add(new SqlParameter("@description", product.Description));
@@ -169,6 +180,8 @@ namespace BangazonAPI.Controllers
                 }
             }
         }
+
+        /* Code for Deleting Product */
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
@@ -213,7 +226,7 @@ namespace BangazonAPI.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                        SELECT Id, Price, Title, Description, Quantity
+                        SELECT Id, ProductTypeId, CustomerId, Price, Title, Description, Quantity
                         FROM Product
                         WHERE Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
