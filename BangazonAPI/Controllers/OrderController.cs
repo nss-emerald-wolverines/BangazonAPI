@@ -59,9 +59,9 @@ namespace BangazonAPI.Controllers
                     if (!string.IsNullOrWhiteSpace(q))
                     {
                         cmd.CommandText += @" AND 
-                                             ( LIKE @q OR
-                                              s.LastName LIKE @q OR
-                                              s.SlackHandle LIKE @q)";
+                                             ( o.CustomerId LIKE @q OR
+                                              o.PaymentTypeId LIKE @q";
+
                         cmd.Parameters.Add(new SqlParameter("@q", $"%{q}%"));
                     }
 
