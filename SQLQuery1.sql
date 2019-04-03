@@ -298,3 +298,14 @@ VALUES (1, 1),
 (13, 5),
 (14, 13),
 (15, 1);
+
+SELECT o.Id AS OrderId,
+    o.CustomerId,
+    o.PaymentTypeId,
+    c.FirstName,
+    c.LastName,
+    pt.AcctNumber,
+    pt.[Name] AS PaymentTypeName
+FROM [Order] o
+LEFT JOIN Customer c on o.CustomerId = c.id
+LEFT JOIN PaymentType pt on o.PaymentTypeId = pt.id
