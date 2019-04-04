@@ -17,5 +17,10 @@ namespace BangazonAPI.Models
         [Required]
         [StringLength(55)]
         public string LastName { get; set; }
+
+        public Product Product { get; set; }
+
+        public PaymentType PaymentType { get; set; }
     }
 }
+
