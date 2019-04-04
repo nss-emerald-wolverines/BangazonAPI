@@ -1,5 +1,4 @@
 ﻿using BangazonAPI.Models;
-using BangazonAPITests;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -42,7 +41,7 @@ namespace TestBangazonAPI
         }
 
         [Fact]
-        public async Task Test_Insert_A_Product()
+        public async Task Test_Post_A_Product()
         {
             using (var client = new APIClientProvider().Client)
             {
@@ -71,8 +70,8 @@ namespace TestBangazonAPI
 
 
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-                Assert.Equal("Bison Burger", newBison.Title);
-                Assert.Equal("Lean Meat to eat", newBison.Description);
+                Assert.Equal(Bison.Title, newBison.Title);
+                Assert.Equal(Bison.Description, newBison.Description);
             }
         }
 
@@ -128,7 +127,7 @@ namespace TestBangazonAPI
             using (var client = new APIClientProvider().Client)
             {
 
-                var response = await client.DeleteAsync("/api/product/24");
+                var response = await client.DeleteAsync("/api/product/30");
 
 
                 string responseBody = await response.Content.ReadAsStringAsync();

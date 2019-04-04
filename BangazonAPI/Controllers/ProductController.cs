@@ -126,7 +126,7 @@ namespace BangazonAPI.Controllers
 
                     int newId = (int)cmd.ExecuteScalar();
                     product.Id = newId;
-                    return CreatedAtRoute("GetProduct", new { id = newId }, product);
+                    return CreatedAtRoute("GetOneProduct", new { id = newId }, product);
                 }
             }
         }
@@ -184,10 +184,8 @@ namespace BangazonAPI.Controllers
         /* Code for Deleting Product */
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete([FromRoute] int id)
-        {
-            try
-            {
+        public void Delete([FromRoute] int id)
+        {          
                 using (SqlConnection conn = Connection)
                 {
                     conn.Open();
@@ -196,26 +194,9 @@ namespace BangazonAPI.Controllers
                         cmd.CommandText = @"DELETE FROM Product WHERE Id = @id";
                         cmd.Parameters.Add(new SqlParameter("@id", id));
 
-                        int rowsAffected = cmd.ExecuteNonQuery();
-                        if (rowsAffected > 0)
-                        {
-                            return new StatusCodeResult(StatusCodes.Status204NoContent);
-                        }
-                        throw new Exception("No rows affected");
+                        cmd.ExecuteNonQuery();
                     }
-                }
-            }
-            catch (Exception)
-            {
-                if (!ProductExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+                }    
         }
 
         private bool ProductExists(int id)
