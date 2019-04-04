@@ -1,5 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using BangazonAPI.Models;
+using BangazonAPITests;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -58,7 +61,7 @@ namespace TestBangazonAPI
                 var BisonAsJSON = JsonConvert.SerializeObject(Bison);
 
                 var response = await client.PostAsync(
-                    "/api/student",
+                    "/api/product",
                     new StringContent(BisonAsJSON, Encoding.UTF8, "application/json")
                 );
 
@@ -125,7 +128,7 @@ namespace TestBangazonAPI
             using (var client = new APIClientProvider().Client)
             {
 
-                var response = await client.DeleteAsync("/api/product/9");
+                var response = await client.DeleteAsync("/api/product/24");
 
 
                 string responseBody = await response.Content.ReadAsStringAsync();
