@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Xunit;
 // using Microsoft.AspNetCore.Mvc.Testing;
 
+
 namespace TestBangazonAPI
 {
     public class OrderTest
@@ -18,7 +19,7 @@ namespace TestBangazonAPI
         {
             using (HttpClient client = new APIClientProvider().Client)
             {
-                var response = await client.GetAsync("/api/order");
+                var response = await client.GetAsync("/api/Order");
 
                 response.EnsureSuccessStatusCode();
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -30,12 +31,12 @@ namespace TestBangazonAPI
         {
             using (var client = new APIClientProvider().Client)
             {
-                var response = await client.GetAsync("/api/order/1");
+                var response = await client.GetAsync("/api/Order/1");
 
                 response.EnsureSuccessStatusCode();
 
                 string responseBody = await response.Content.ReadAsStringAsync();
-                var student = JsonConvert.DeserializeObject<Order>(responseBody);
+                var order = JsonConvert.DeserializeObject<Order>(responseBody);
 
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 int customerId = order.CustomerId;
@@ -66,7 +67,7 @@ namespace TestBangazonAPI
                 var markAsJSON = JsonConvert.SerializeObject(mark);
 
                 var response = await client.PostAsync(
-                    "/api/order",
+                    "/api/Order",
                     new StringContent(markAsJSON, Encoding.UTF8, "application/json")
                 );
 
@@ -96,7 +97,7 @@ namespace TestBangazonAPI
             {
                 Order changedOrder= new Order
                     {
-                        CustomerId = "1",
+                        CustomerId = 1,
                         PaymentTypeId = noPymt
                     };
                     var changedOrderAsJSON = JsonConvert.SerializeObject(changedOrder);

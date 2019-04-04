@@ -34,7 +34,7 @@ namespace BangazonAPI.Controllers
         // public IActionResult Get(string q, string include)
 
         [HttpGet]
-        public IEnumerable<order> Get(string include, string q)
+        public IEnumerable<Order> Get(string include, string q)
         {
             {
                 using (SqlConnection conn = Connection)
@@ -86,51 +86,21 @@ namespace BangazonAPI.Controllers
                         }
 
                         SqlDataReader reader = cmd.ExecuteReader();
-
                         Dictionary<int, Order> dictionaryOP = new Dictionary<int, Order>();
 
                         while (reader.Read())
                         {
-                            if (include == "product")
+                            int orderId = reader.GetInt32(reader.GetOrdinal("OrderId"));
+                            if (!dictionaryOP.ContainsKey(orderId))
                             {
-                                order newOrderP = new order()
+                                if (include == "customer")
                                 {
-                                    Id = reader.GetInt32(reader.GetOrdinal("OrderId")),
-                                    CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
-                                    PaymentTypeId = reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
-                                    ListofOrderProducts = new List<OrderProduct>()
-                                };
-
-                                //if (!reader.IsDBNull(reader.GetOrdinal("OrderProductId")))
-
-                                int orderProductId = reader.GetInt32(reader.GetOrdinal("OrderProductId"));
-                                if (newOrderP.ListofOrderProducts.Any(i => i.Id == orderProductId))
-                                {
-                                    OrderProduct orderProduct = new OrderProduct
+                                    Order newOrder = new Order
                                     {
-                                        Id = reader.GetInt32(reader.GetOrdinal("OrderProductId")),
-                                        ProductId = reader.GetInt32(reader.GetOrdinal("ProductId")),
-                                        OrderId = newOrderP.Id,
-                                        Product = new Product
-                                        {
-                                            Id = reader.GetInt32(reader.GetOrdinal("ProductId")),
-                                            ProductTypeId = reader.GetInt32(reader.GetOrdinal("ProductTypeId")),
-                                            CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
-                                            Price = reader.GetInt32(reader.GetOrdinal("Price")),
-                                            Title = reader.GetString(reader.GetOrdinal("Title")),
-                                            Description = reader.GetString(reader.GetOrdinal("Description")),
-                                            Quantity = reader.GetInt32(reader.GetOrdinal("Quantity"))
-                                        }
-                                    };
-                                    orders.Add(newOrderP);
-                                }
-                                else if (include == "customer")
-                                {
-                                    order newOrderC = new order()
-                                    {
-                                        Id = reader.GetInt32(reader.GetOrdinal("OrderId")),
+                                        Id = orderId,
                                         CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
                                         PaymentTypeId = reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
+                                        ListofOrderProducts = new List<OrderProduct>(),
                                         Customer = new Customer
                                         {
                                             Id = reader.GetInt32(reader.GetOrdinal("CustomerId")),
@@ -138,34 +108,60 @@ namespace BangazonAPI.Controllers
                                             LastName = reader.GetString(reader.GetOrdinal("LastName"))
                                         }
                                     };
-                                    orders.Add(newOrderC);
+                                    dictionaryOP.Add(orderId, newOrder);
                                 }
                                 else
                                 {
-                                    order newOrder = new order
+                                    Order newOrder = new Order
                                     {
-                                        Id = reader.GetInt32(reader.GetOrdinal("OrderId")),
+                                        Id = orderId,
                                         CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
-                                        PaymentTypeId = reader.GetInt32(reader.GetOrdinal("PaymentTypeId"))
+                                        PaymentTypeId = reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
+                                        ListofOrderProducts = new List<OrderProduct>()
                                     };
-                                    orders.Add(newOrder);
+
+                                    dictionaryOP.Add(orderId, newOrder);
+
+                                    if (include == "product")
+                                    {
+                                        if (!reader.IsDBNull(reader.GetOrdinal("OrderId")))
+                                        {
+                                            Order currentOrder = dictionaryOP[orderId];
+                                            currentOrder.ListofOrderProducts.Add(
+                                            new OrderProduct
+                                            {
+                                                Id = reader.GetInt32(reader.GetOrdinal("OrderProductId")),
+                                                ProductId = reader.GetInt32(reader.GetOrdinal("ProductId")),
+                                                Product = new Product
+                                                {
+                                                    Id = reader.GetInt32(reader.GetOrdinal("ProductId")),
+                                                    ProductTypeId = reader.GetInt32(reader.GetOrdinal("ProductTypeId")),
+                                                    CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
+                                                    Price = reader.GetInt32(reader.GetOrdinal("Price")),
+                                                    Title = reader.GetString(reader.GetOrdinal("Title")),
+                                                    Description = reader.GetString(reader.GetOrdinal("Description")),
+                                                    Quantity = reader.GetInt32(reader.GetOrdinal("Quantity"))
+                                                }
+                                            }
+                                            );
+                                        }
+                                    }
                                 }
                             }
                         }
-
-                    reader.Close();
-                    return orders;                       
+                        reader.Close();
+                        return Ok(newOrders);
                     }
                 }
             }
         }
-
+        
 
 
         // Get: api/Order/5?include=customer
         [HttpGet("{id}", Name = "GetOneOrder")]
 
-        public order Get(int id, string include)
+        public Order Get(int id, string include)
         // public async Task<IActionResult> Get([FromRoute] int id)                
         {
             using (SqlConnection conn = Connection)
@@ -211,14 +207,14 @@ namespace BangazonAPI.Controllers
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
-                    order order = null;
+                    Order order = null;
                     while (reader.Read())
                     {
                         if (order == null)
                         {
                             if (include == "product")
                             {
-                                order = new order
+                                order = new Order
                                 {
                                     Id = reader.GetInt32(reader.GetOrdinal("OrderId")),
                                     CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
@@ -249,7 +245,7 @@ namespace BangazonAPI.Controllers
                             }
                             else if (include == "customer")
                             {
-                                order = new order
+                                order = new Order
                                 {
                                     Id = reader.GetInt32(reader.GetOrdinal("OrderId")),
                                     CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
@@ -264,7 +260,7 @@ namespace BangazonAPI.Controllers
                             }
                             else
                             {
-                                order = new order
+                                order = new Order
                                 {
                                     Id = reader.GetInt32(reader.GetOrdinal("OrderId")),
                                     CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
@@ -283,7 +279,7 @@ namespace BangazonAPI.Controllers
         // CODE FOR CREATING AN ORDER
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] order order)
+        public async Task<IActionResult> Post([FromBody] Order order)
         {
             using (SqlConnection conn = Connection)
             {
@@ -311,7 +307,7 @@ namespace BangazonAPI.Controllers
         // public void Put(int id, [FromBody] string value)
 
         [HttpPut("{id}")]
-        public IActionResult Put([FromRoute] int id, [FromBody] order order)
+        public IActionResult Put([FromRoute] int id, [FromBody] Order order)
         {
             try
             {

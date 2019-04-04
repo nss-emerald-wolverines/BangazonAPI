@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BangazonAPI.Models
 {
-    public class order
+    public class Order
     {
         public int Id { get; set; }
 
