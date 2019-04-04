@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
+using KennelAPI;
 using System.Net.Http;
 using Xunit;
-using BangazonAPI;
 
-namespace TestBangazonAPI.Test
+namespace TestBangazonAPI
 {
     class APIClientProvider : IClassFixture<WebApplicationFactory<Startup>>
     {

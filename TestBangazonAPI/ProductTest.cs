@@ -1,10 +1,14 @@
+﻿using Newtonsoft.Json;
 using System;
+using System.Net;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
 namespace TestBangazonAPI
 {
-    public class ProductCRUD
+    public class ProductTest
     {
         [Fact]
         public async Task Test_Get_All_Products()
@@ -35,61 +39,65 @@ namespace TestBangazonAPI
         }
 
         [Fact]
-        public async Task Test_Insert_A_Student()
+        public async Task Test_Insert_A_Product()
         {
             using (var client = new APIClientProvider().Client)
             {
 
-                Product Allison = new Product
+                Product Bison = new Product
                 {
-                    FirstName = "Allison",
-                    LastName = "Collins",
-                    SlackHandle = "alpal26",
-                    CohortId = 3
+                    ProductTypeId = 4,
+                    CustomerId = 2,
+                    Price = 15.99,
+                    Title = "Bison Burger",
+                    Description = "Lean Meat to eat",
+                    Quantity = 3
                 };
 
 
-                var AllisonAsJSON = JsonConvert.SerializeObject(Allison);
+                var BisonAsJSON = JsonConvert.SerializeObject(Bison);
 
                 var response = await client.PostAsync(
                     "/api/student",
-                    new StringContent(AllisonAsJSON, Encoding.UTF8, "application/json")
+                    new StringContent(BisonAsJSON, Encoding.UTF8, "application/json")
                 );
 
                 string responseBody = await response.Content.ReadAsStringAsync();
 
-                var newAllison = JsonConvert.DeserializeObject<Student>(responseBody);
+                var newBison = JsonConvert.DeserializeObject<Product>(responseBody);
 
 
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-                Assert.Equal("Allison", newAllison.FirstName);
-                Assert.Equal("Collins", newAllison.LastName);
+                Assert.Equal("Bison Burger", newBison.Title);
+                Assert.Equal("Lean Meat to eat", newBison.Description);
             }
         }
 
         [Fact]
-        public async Task Test_Modify_Student()
+        public async Task Test_Edit_Product()
         {
             // New last name to change to and test
-            string newLastName = "SoFly";
+            string newDescription = "Butcher's Choice";
 
             using (var client = new APIClientProvider().Client)
             {
                 /*
                     PUT section
                 */
-                Product modifiedAllison = new Product
+                Product modifiedBison = new Product
                 {
-                    FirstName = "Allison",
-                    LastName = newLastName,
-                    SlackHandle = "alpal26",
-                    CohortId = 3
+                    ProductTypeId = 4,
+                    CustomerId = 2,
+                    Price = 15.99,
+                    Title = "Bison Burger",
+                    Description = newDescription,
+                    Quantity = 3
                 };
-                var modifiedJAllisonAsJSON = JsonConvert.SerializeObject(modifiedAllison);
+                var modifiedBisonAsJSON = JsonConvert.SerializeObject(modifiedBison);
 
                 var response = await client.PutAsync(
-                    "/api/student/9",
-                    new StringContent(modifiedJAllisonAsJSON, Encoding.UTF8, "application/json")
+                    "/api/product/9",
+                    new StringContent(modifiedBisonAsJSON, Encoding.UTF8, "application/json")
                 );
                 string responseBody = await response.Content.ReadAsStringAsync();
 
@@ -100,18 +108,18 @@ namespace TestBangazonAPI
                     GET section
                     Verify that the PUT operation was successful
                 */
-                var getAllison = await client.GetAsync("/api/product/9");
-                getAllison.EnsureSuccessStatusCode();
+                var getBison = await client.GetAsync("/api/product/9");
+                getBison.EnsureSuccessStatusCode();
 
-                string getAllisonBody = await getAllison.Content.ReadAsStringAsync();
-                Product newAllison = JsonConvert.DeserializeObject<Product>(getAllisonBody);
+                string getBisonBody = await getBison.Content.ReadAsStringAsync();
+                Product newBison = JsonConvert.DeserializeObject<Product>(getBisonBody);
 
-                Assert.Equal(HttpStatusCode.OK, getAllison.StatusCode);
-                Assert.Equal(newLastName, newAllison.LastName);
+                Assert.Equal(HttpStatusCode.OK, getBison.StatusCode);
+                Assert.Equal(newDescription, newBison.Description);
             }
         }
         [Fact]
-        public async Task Test_Delete_Student()
+        public async Task Test_Delete_Product()
         {
 
             using (var client = new APIClientProvider().Client)
