@@ -18,7 +18,7 @@ namespace BangazonAPI.Controllers
     {
       get
       {
-        string connectionSTring = "Server=localhost\\SQLExpress;Database=BangazonDB;Integrated Security=true";
+        string connectionSTring = "Server=localhost\\SQLExpress;Database=BangazonAPI;Integrated Security=true";
         return new SqlConnection(connectionSTring);
       }
     }
