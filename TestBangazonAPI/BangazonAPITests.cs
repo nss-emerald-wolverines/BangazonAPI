@@ -1,12 +1,11 @@
+using BangazonAPI.Models;
 using Newtonsoft.Json;
-using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
-using BangazonAPI;
-using BangazonAPI.Models;
 namespace BangazonAPITests
 {
     public class CustomerTests
@@ -15,22 +14,31 @@ namespace BangazonAPITests
         public async Task GetCustomer_Success()
         {
 
-            using (var client = new APIClientProvider().Client)
+            using (HttpClient client = new APIClientProvider().Client)
             {
-                var response = await client.GetAsync("api/Customer");
+                HttpResponseMessage response = await client.GetAsync("api/Customer");
                 response.EnsureSuccessStatusCode();
-
+                string responseBody = await response.Content.ReadAsStringAsync();
+                var CustomerList = JsonConvert.DeserializeObject<List<Customer>>(responseBody);
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.True(CustomerList.Count > 0);
             }
+
         }
+
+
         [Fact]
         public async Task GetCustomers_Success()
         {
 
-            using (var client = new APIClientProvider().Client)
+            using (HttpClient client = new APIClientProvider().Client)
             {
-                var response = await client.GetAsync("api/Customer/5");
+                HttpResponseMessage response = await client.GetAsync("api/Customer/5");
                 response.EnsureSuccessStatusCode();
-
+                string responseBody = await response.Content.ReadAsStringAsync();
+                var CustomerList = JsonConvert.DeserializeObject<Customer>(responseBody);
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.True(CustomerList.Id == 5);
             }
         }
 
@@ -38,64 +46,64 @@ namespace BangazonAPITests
         public async Task GetCustomersq_Success()
         {
 
-            using (var client = new APIClientProvider().Client)
+            using (HttpClient client = new APIClientProvider().Client)
             {
-                var response = await client.GetAsync("api/Customer?q=test");
+                HttpResponseMessage response = await client.GetAsync("api/Customer?q=mir");
                 response.EnsureSuccessStatusCode();
-
+                string responseBody = await response.Content.ReadAsStringAsync();
+                var CustomerList = JsonConvert.DeserializeObject<List<Customer>>(responseBody);
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.True(CustomerList.Count > 0);
             }
+
         }
 
         [Fact]
         public async Task PostCustomer_Success()
         {
 
-            using (var client = new APIClientProvider().Client)
+            using (HttpClient client = new APIClientProvider().Client)
             {
-                var customer = GenerateCustomer();
-                var response = await client.PostAsync("api/Customer", new StringContent(customer, Encoding.UTF8, "application/json"));
+                string customer = GenerateCustomer();
+                HttpResponseMessage response = await client.PostAsync("api/Customer", new StringContent(customer, Encoding.UTF8, "application/json"));
+                response.EnsureSuccessStatusCode();
+                string responseBody = await response.Content.ReadAsStringAsync();
+                Customer DeJSONCustomer = JsonConvert.DeserializeObject<Customer>(responseBody);
+                Assert.Equal("Marshal", DeJSONCustomer.FirstName);
+                Assert.Equal("Lee", DeJSONCustomer.LastName);
             }
         }
-
         private string GenerateCustomer()
         {
-            var customer = new Customer
+            Customer customer = new Customer
             {
                 FirstName = "Marshal",
                 LastName = "Lee"
             };
-            Assert.Equal("Marshal", customer.FirstName);
-            Assert.Equal("Lee", customer.LastName);
             return JsonConvert.SerializeObject(customer);
-
         }
-
-
-
         [Fact]
-        public async Task PutCustomer_Succes()
+        public async Task PutCustomer_Success()
         {
-
-            using (var client = new APIClientProvider().Client)
+            using (HttpClient client = new APIClientProvider().Client)
             {
-                var customer = GenerateCustomers();
-                var response = await client.PutAsync("api/Customer/4", new StringContent(customer , Encoding.UTF8, "application/json"));
+                string customer = GenerateCustomerPut();
+                HttpResponseMessage response = await client.PutAsync("api/Customer/4", new StringContent(customer, Encoding.UTF8, "application/json"));
                 response.EnsureSuccessStatusCode();
+                Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
             }
         }
-
-
-        private string GenerateCustomers()
+        private string GenerateCustomerPut()
         {
-            var customer = new Customer
+            Customer customer = new Customer
             {
-                FirstName = "gabryella",
-                LastName = "crawford"
+                FirstName = "slenish",
+                LastName = "moroius"
             };
-            Assert.Equal("gabryella", customer.FirstName);
-            Assert.Equal("crawford", customer.LastName);
+
             return JsonConvert.SerializeObject(customer);
+
         }
     }
 }

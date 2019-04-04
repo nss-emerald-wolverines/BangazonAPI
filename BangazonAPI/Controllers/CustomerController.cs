@@ -23,33 +23,6 @@ namespace BangazonAPI.Controllers
             _config = config;
         }
         public SqlConnection Connection => new SqlConnection(_config.GetConnectionString("DefaultConnection"));
-        public async Task<IActionResult> Get()
-        {
-            using (SqlConnection conn = Connection)
-            {
-                List<object> customerControlerlist = new List<object>();
-
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "SELECT Id, FirstName, LastName FROM Customer";
-                    SqlDataReader reader = cmd.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        Customer customer = new Customer()
-                        {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                            LastName = reader.GetString(reader.GetOrdinal("LastName"))
-                        };
-                        customerControlerlist.Add(customer);
-
-                    }
-                    reader.Close();
-                    return Ok(customerControlerlist);
-                }
-            }
-        }
 
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] Customer customer)
@@ -141,6 +114,7 @@ namespace BangazonAPI.Controllers
                 }
             }
         }
+
 
 
         [HttpGet]
