@@ -87,7 +87,7 @@ namespace BangazonAPI.Controllers
 
                         SqlDataReader reader = cmd.ExecuteReader();
 
-                        List<order> orders = new List<order>();
+                        Dictionary<int, Order> dictionaryOP = new Dictionary<int, Order>();
 
                         while (reader.Read())
                         {
