@@ -151,15 +151,15 @@ namespace BangazonAPI.Controllers
                                     orders.Add(newOrder);
                                 }
                             }
-
-                            reader.Close();
-                            return orders;
-                            ;
                         }
+
+                    reader.Close();
+                    return orders;                       
                     }
                 }
             }
         }
+
 
 
         // Get: api/Order/5?include=customer
@@ -406,6 +406,23 @@ namespace BangazonAPI.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"SELECT Id, CustomerId, PaymentTypeId
+                                        FROM Order
+                                        WHERE Id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    return reader.Read();
+                }
+            }
+        }
+        private bool PaymentTypeIsNUll(int id)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT Id, PaymentTypeId
                                         FROM Order
                                         WHERE Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
