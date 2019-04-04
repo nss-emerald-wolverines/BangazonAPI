@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using BangazonAPI.Models;
+using Microsoft.AspNetCore.Http;
 
 namespace BangazonAPI.Controllers
 {
@@ -119,31 +120,69 @@ namespace BangazonAPI.Controllers
 
         // PUT api/values/5
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] PaymentType editPaymentType)
+        public async Task<IActionResult> Put([FromRoute] int id, [FromBody] PaymentType paymentType)
         {
+          try
+          {
             using (SqlConnection conn = Connection)
             {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = @"UPDATE PaymentType
-                                           SET AcctNumber = @acctNumber,
-                                               Name = @name,
-                                               CustomerId = @customerId
-                                         WHERE Id = @id";
-                    cmd.Parameters.Add(new SqlParameter("@acctNumber", editPaymentType.AcctNumber));
-                    cmd.Parameters.Add(new SqlParameter("@name", editPaymentType.Name));
-                    cmd.Parameters.Add(new SqlParameter("@customerId", editPaymentType.CustomerId));
-                    cmd.Parameters.Add(new SqlParameter("@id", editPaymentType.Id));
+              conn.Open();
+              using (SqlCommand cmd = conn.CreateCommand())
+              {
+                cmd.CommandText = @"UPDATE PaymentType
+                                                   SET AcctNumber = @acctNumber,
+                                                       Name = @name,
+                                                       CustomerId = @customerId
+                                                 WHERE Id = @id";
+                cmd.Parameters.Add(new SqlParameter("@acctNumber", paymentType.AcctNumber));
+                cmd.Parameters.Add(new SqlParameter("@name", paymentType.Name));
+                cmd.Parameters.Add(new SqlParameter("@customerId", paymentType.CustomerId));
+                cmd.Parameters.Add(new SqlParameter("@id", paymentType.Id));
 
-                    cmd.ExecuteNonQuery();
-                    return NoContent();
+                int rowsAffected = cmd.ExecuteNonQuery();
+                if (rowsAffected > 0)
+                {
+                  return new StatusCodeResult(StatusCodes.Status204NoContent);
                 }
+                throw new Exception("No rows affected");
+              }
             }
+          }
+          catch (Exception)
+          {
+            if (!PaymentTypeExists(id))
+            {
+              return NotFound();
+            }
+
+            throw;
+
+          }
+        }
+        private bool PaymentTypeExists(int id)
+        {
+
+          using (SqlConnection conn = Connection)
+          {
+
+            conn.Open();
+            using (SqlCommand cmd = conn.CreateCommand())
+            {
+
+              cmd.CommandText = $@"SELECT Id, AcctName, Name, CustomerId 
+                                               FROM PaymentType 
+                                              WHERE Id = @id";
+
+              cmd.Parameters.Add(new SqlParameter("@id", id));
+
+              SqlDataReader reader = cmd.ExecuteReader();
+              return reader.Read();
+            }
+          }
         }
 
-        // DELETE api/values/5              
-        [HttpDelete("{id}")]
+    // DELETE api/values/5              
+    [HttpDelete("{id}")]
         public void Delete(int id)
         {
         }
