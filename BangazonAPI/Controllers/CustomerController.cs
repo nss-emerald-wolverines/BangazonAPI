@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using BangazonAPI.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -6,7 +7,6 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
-using BangazonAPI.Models;
 namespace BangazonAPI.Controllers
 
 {
@@ -165,6 +165,86 @@ namespace BangazonAPI.Controllers
                 }
             }
         }
+
+
+
+
+        //[HttpGet]
+        //public IEnumerable<Customer> Get(string include, string q)
+        //{
+        //    using (SqlConnection conn = Connection)
+        //    {
+        //        conn.Open();
+        //        using (SqlCommand cmd = conn.CreateCommand())
+        //        {
+        //            if (include == "Product")
+        //            {
+        //                cmd.CommandText = @"select c.id as CustomerId,
+        //                                       c.FirstName,
+        //                                       c.LastName,
+        //                                       p.ProductTypeId
+        //                                       p.CustomerId
+        //                                       p.Price
+        //                                       p.Title
+        //                                       p.Description
+        //                                       p.Quantity
+        //                                  from Customer c
+        //                                       left join Product p on c.CustomerId = c.id
+        //                                 WHERE 1 = 1";
+        //            }
+
+        //            if (!string.IsNullOrWhiteSpace(q))
+        //            {
+        //                cmd.CommandText += @" AND 
+        //                                     (s.FirstName LIKE @q OR
+        //                                      s.LastName LIKE @q OR)";
+        //                cmd.Parameters.Add(new SqlParameter("@q", $"%{q}%"));
+        //            }
+
+        //            SqlDataReader reader = cmd.ExecuteReader();
+
+        //            Dictionary<int, Customer> students = new Dictionary<int, Customer>();
+        //            while (reader.Read())
+        //            {
+        //                int studentId = reader.GetInt32(reader.GetOrdinal("CustomerId"));
+        //                if (!students.ContainsKey(studentId))
+        //                {
+        //                    Customer newStudent = new Customer
+        //                    {
+        //                        Id = CustomerId,
+        //                        FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+        //                        LastName = reader.GetString(reader.GetOrdinal("LastName")),
+        //                        Product = new Product
+        //                        {
+
+        //                        }
+        //                    };
+
+        //                    students.Add(studentId, newStudent);
+        //                }
+
+        //                if (include == "Product")
+        //                {
+        //                    if (!reader.IsDBNull(reader.GetOrdinal("ExerciseId")))
+        //                    {
+        //                        Customer currentCustomer = Customer[CustomerId];
+        //                        currentCustomer.Product.Add(
+        //                            new Product
+        //                            {
+
+        //                            }
+        //                        );
+        //                    }
+        //                }
+        //            }
+
+        //            reader.Close();
+
+        //            return students.Values.ToList();
+        //        }
+        //    }
+        //}
+
 
 
         private bool CustomerExists(int id)
