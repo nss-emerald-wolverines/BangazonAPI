@@ -51,7 +51,7 @@ namespace TestBangazonAPI
         var PaymentTypeAsJSON = JsonConvert.SerializeObject(TestPaymentType);
 
         var response = await client.PostAsync(
-            "/api/product",
+            "/api/PaymentType",
             new StringContent(PaymentTypeAsJSON, Encoding.UTF8, "application/json")
         );
 
