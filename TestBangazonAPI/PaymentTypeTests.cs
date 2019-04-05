@@ -30,9 +30,9 @@ namespace TestBangazonAPI
       {
         var response = await client.GetAsync("/api/PaymentType/1");
         string responseBody = await response.Content.ReadAsStringAsync();
-        var Product = JsonConvert.DeserializeObject<PaymentType>(responseBody);
+        var PaymentType = JsonConvert.DeserializeObject<PaymentType>(responseBody);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.True(Product.Id == 1);
+        Assert.True(PaymentType.Id == 1);
       }
     }
     [Fact]
@@ -40,25 +40,21 @@ namespace TestBangazonAPI
     {
       using (var client = new APIClientProvider().Client)
       {
-
         PaymentType TestPaymentType = new PaymentType
         {
           AcctNumber = 42012346,
           Name = "AMEX_Platinum",
           CustomerId = 1
         };
-
         var PaymentTypeAsJSON = JsonConvert.SerializeObject(TestPaymentType);
 
         var response = await client.PostAsync(
             "/api/PaymentType",
             new StringContent(PaymentTypeAsJSON, Encoding.UTF8, "application/json")
         );
-
         string responseBody = await response.Content.ReadAsStringAsync();
 
         var newPaymentType = JsonConvert.DeserializeObject<PaymentType>(responseBody);
-
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         Assert.Equal(TestPaymentType.AcctNumber, newPaymentType.AcctNumber);
@@ -69,7 +65,7 @@ namespace TestBangazonAPI
     [Fact]
     public async Task Test_Edit_PaymentType()
     {
-      // New last name to change to and test
+      // New name change to test
       string newName = "AMEX_Red";
 
       using (var client = new APIClientProvider().Client)
@@ -79,6 +75,7 @@ namespace TestBangazonAPI
         */
         PaymentType modifiedPaymentType = new PaymentType
         {
+          Id = 18,
           AcctNumber = 42012346,
           Name = newName,
           CustomerId = 1
@@ -86,7 +83,7 @@ namespace TestBangazonAPI
         var modifiedPaymentTypeAsJSON = JsonConvert.SerializeObject(modifiedPaymentType);
 
         var response = await client.PutAsync(
-            "/api/PaymentType/1",
+            "/api/PaymentType/18",
             new StringContent(modifiedPaymentTypeAsJSON, Encoding.UTF8, "application/json")
         );
         string responseBody = await response.Content.ReadAsStringAsync();
@@ -98,7 +95,7 @@ namespace TestBangazonAPI
             GET section
             Verify that the PUT operation was successful
         */
-        var getPaymentType = await client.GetAsync("/api/PaymentType/1");
+        var getPaymentType = await client.GetAsync("/api/PaymentType/18");
         getPaymentType.EnsureSuccessStatusCode();
 
         string getPaymentTypeBody = await getPaymentType.Content.ReadAsStringAsync();
@@ -115,7 +112,7 @@ namespace TestBangazonAPI
       using (var client = new APIClientProvider().Client)
       {
 
-        var response = await client.DeleteAsync("/api/PaymentType/17");
+        var response = await client.DeleteAsync("/api/PaymentType/22");
 
 
         string responseBody = await response.Content.ReadAsStringAsync();
@@ -124,7 +121,7 @@ namespace TestBangazonAPI
         /*
             ASSERT
         */
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
       }
     }

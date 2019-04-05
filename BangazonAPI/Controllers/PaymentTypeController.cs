@@ -130,10 +130,10 @@ namespace BangazonAPI.Controllers
           using (SqlCommand cmd = conn.CreateCommand())
           {
             cmd.CommandText = @"UPDATE PaymentType
-                                                   SET AcctNumber = @acctNumber,
-                                                       Name = @name,
-                                                       CustomerId = @customerId
-                                                 WHERE Id = @id";
+                                   SET AcctNumber = @acctNumber,
+                                       Name = @name,
+                                       CustomerId = @customerId
+                                 WHERE Id = @id";
             cmd.Parameters.Add(new SqlParameter("@acctNumber", paymentType.AcctNumber));
             cmd.Parameters.Add(new SqlParameter("@name", paymentType.Name));
             cmd.Parameters.Add(new SqlParameter("@customerId", paymentType.CustomerId));
@@ -169,7 +169,7 @@ namespace BangazonAPI.Controllers
         using (SqlCommand cmd = conn.CreateCommand())
         {
 
-          cmd.CommandText = $@"SELECT Id, AcctName, Name, CustomerId 
+          cmd.CommandText = @"SELECT Id, AcctName, Name, CustomerId 
                                                FROM PaymentType 
                                               WHERE Id = @id";
 
@@ -192,7 +192,7 @@ namespace BangazonAPI.Controllers
           conn.Open();
           using (SqlCommand cmd = conn.CreateCommand())
           {
-            cmd.CommandText = $@"DELETE FROM PaymentType 
+            cmd.CommandText = @"DELETE FROM PaymentType 
                                   WHERE Id = @id";
 
             cmd.Parameters.Add(new SqlParameter("@id", id));
@@ -213,7 +213,10 @@ namespace BangazonAPI.Controllers
         {
           return NotFound();
         }
-        throw;
+        else
+        {
+          throw;
+        }
       }
     }
   }
