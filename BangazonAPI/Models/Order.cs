@@ -8,18 +8,23 @@ namespace BangazonAPI.Models
 {
     public class Order
     {
-        public int Id { get; set; }
+        private Customer _customer;
+
+        [Key]
+        public int OrderId { get; set; }
 
         [Required]
         public int CustomerId { get; set; }
 
-        [Required]
         public int PaymentTypeId { get; set; }
+        // public int? CustomerPaymentId { get; set; } // ? means that the variable can be null????
 
-        public Customer Customer { get; set; }
+        public Customer Customer { get; set; }        
 
-        public PaymentType PaymentType { get; set; }
+        // public Customer Customer { get => _customer; set => _customer = value; }
 
-        public List<OrderProduct> ListofOrderProducts { get; set; } = new List<OrderProduct>();
+        public PaymentType PaymentType { get; set; } // Not needed for this sprint
+
+        public List<Product> ListofProducts { get; set; } = new List<Product>();
     }
 }
