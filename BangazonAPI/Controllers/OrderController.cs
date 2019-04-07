@@ -50,7 +50,7 @@ namespace BangazonAPI.Controllers
 
                     if (include == "customer")
                     {
-                        cmd.CommandText += ", c.Id AS cId, c.FirstName, c.LastName, o.Customer";
+                        cmd.CommandText += ", c.Id AS cId, c.FirstName, c.LastName";
                     }
 
                     if (include == "product")
@@ -187,7 +187,7 @@ namespace BangazonAPI.Controllers
 
                     if (include == "customer")
                     {
-                        cmd.CommandText += ", c.Id AS CustomerId, c.FirstName, c.LastName, o.Customer";
+                        cmd.CommandText += ", c.Id AS CustomerId, c.FirstName, c.LastName";
                     }
 
                     if (include == "product")
@@ -202,7 +202,7 @@ namespace BangazonAPI.Controllers
                                         INNER JOIN Product p ON p.Id = op.ProductId
                                         WHERE o.Id = @id";                   
 
-                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    cmd.Parameters.Add(new SqlParameter("@id", id));                    
 
                     SqlDataReader reader = cmd.ExecuteReader();
 
@@ -238,7 +238,7 @@ namespace BangazonAPI.Controllers
                                     );
                             }
                         }
-                        if (include == "customer")
+                 /*       if (include == "customer")
                         {
                             if (!reader.IsDBNull(reader.GetOrdinal("CustomerId")))
                             {
@@ -251,7 +251,7 @@ namespace BangazonAPI.Controllers
                                     }
                                     );
                             }
-                        }
+                        }   */
                     }
                     
                     reader.Close();
