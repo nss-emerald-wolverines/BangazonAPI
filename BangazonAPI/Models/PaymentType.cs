@@ -8,13 +8,13 @@ namespace BangazonAPI.Models
 {
     public class PaymentType
     {
+        [Key]
         public int Id { get; set; }
 
         [Required]
         public int AcctNumber { get; set; }
 
-        [Required]
-        [StringLength(25, MinimumLength = 2)]
+        [StringLength(15, ErrorMessage = "Maximum length is 15 characters"), Required]
         public string Name { get; set; }
 
         [Required]
