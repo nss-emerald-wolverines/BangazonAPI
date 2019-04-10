@@ -28,6 +28,8 @@ namespace BangazonAPI.Controllers
             }
         }
 
+        public Customer Customer { get; private set; }
+
         // ***** CODE FOR GETTING A LIST - GET: api/Order -  GET: api/Orders?completed=true&include=customer
         // url: http://localhost:5000/order?include=product or http://localhost:5000/order?include=customer
         // url: http://localhost:5000/order?completed=true or http://localhost:5000/order?completed=false
@@ -123,22 +125,20 @@ namespace BangazonAPI.Controllers
 
                             }
                         
-                    /*        if (include == "customer")
+                           if (include == "customer")
                             {
                                 if (!reader.IsDBNull(reader.GetOrdinal("CustomerId")))
-                                {
-                                    // Add the product LIST to the current entry in Dictionary
+                                {                                    
                                     Order currentOrder = dictionaryO[orderId];
-                                    currentOrder.Customer.Add(
-                                    new Customer
+                                    
+                                    currentOrder.Customer = new Customer
                                     {
                                         Id = reader.GetInt32(reader.GetOrdinal("CustomerId")),
                                         FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                                         LastName = reader.GetString(reader.GetOrdinal("LastName"))
-                                    }
-                                    );
+                                    };                                    
                                 }
-                            }     */
+                            }     
 
                             if (include == "product")
                             {
@@ -161,8 +161,7 @@ namespace BangazonAPI.Controllers
                                 }
                             }
                         }
-                    }
-                
+                    }                
                     reader.Close();
                     return Ok(dictionaryO.Values);
                 }
@@ -174,8 +173,8 @@ namespace BangazonAPI.Controllers
         // public async Task<IActionResult> Get([FromRoute] int id)
         //arguments: id specifies which order to get
 
-        [HttpGet("{id}", Name = "GetOneOrder")]        
-        
+        [HttpGet("{id}", Name = "GetOneOrder")]
+
         public async Task<IActionResult> Get([FromRoute] int id, string include)
         {
             using (SqlConnection conn = Connection)
@@ -200,9 +199,9 @@ namespace BangazonAPI.Controllers
                                         INNER JOIN PaymentType pt ON pt.Id = o.PaymentTypeId
                                         INNER JOIN OrderProduct op ON op.Orderid = o.Id
                                         INNER JOIN Product p ON p.Id = op.ProductId
-                                        WHERE o.Id = @id";                   
+                                        WHERE o.Id = @id";
 
-                    cmd.Parameters.Add(new SqlParameter("@id", id));                    
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
 
                     SqlDataReader reader = cmd.ExecuteReader();
 
@@ -211,7 +210,7 @@ namespace BangazonAPI.Controllers
                     while (reader.Read())
                     {
                         if (order == null)
-                        {                            
+                        {
                             order = new Order
                             {
                                 OrderId = reader.GetInt32(reader.GetOrdinal("OrderId")),
@@ -238,27 +237,29 @@ namespace BangazonAPI.Controllers
                                     );
                             }
                         }
-                 /*       if (include == "customer")
+
+                        if (include == "customer")
                         {
                             if (!reader.IsDBNull(reader.GetOrdinal("CustomerId")))
                             {
-                                order.Customer.Add(
-                                    new Customer
-                                    {
-                                        Id = reader.GetInt32(reader.GetOrdinal("CustomerId")),
-                                        FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                                        LastName = reader.GetString(reader.GetOrdinal("LastName"))
-                                    }
-                                    );
+                                int customerId = reader.GetInt32(reader.GetOrdinal("CustomerId"));
+
+                                order.Customer = new Customer
+                                {
+                                    Id = customerId,
+                                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                    LastName = reader.GetString(reader.GetOrdinal("LastName"))
+                                };                                
                             }
-                        }   */
+                        }
                     }
-                    
+
                     reader.Close();
                     return Ok(order);
                 }
             }
         }
+        
                           
         
         // CODE FOR CREATING AN ORDER
